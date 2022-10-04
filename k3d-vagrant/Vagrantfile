@@ -16,15 +16,13 @@ Vagrant.configure("2") do |config|
   # using a specific IP.
   config.vm.network "private_network", ip: "192.168.56.155"
 
-  # Share an additional folder to the guest VM
-  config.vm.synced_folder "./shared", "/vagrant_data"
-
   # Customize hostname of the guestVM
   config.vm.hostname = "k3d-cluster"
 
   config.vm.provider "virtualbox" do |vb|
     # Customize the amount of memory on the guest VM:
     vb.memory = "2048"
+    vb.name = "k3d box"
   end
 
   # Enable provisioning guest VM with shell script

@@ -14,14 +14,15 @@ Vagrant.configure("2") do |config|
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  config.vm.network "private_network", ip: "192.168.56.155"
+  config.vm.network "private_network", type: "dhcp"
 
   # Customize hostname of the guestVM
   config.vm.hostname = "k3d-cluster"
 
   config.vm.provider "virtualbox" do |vb|
     # Customize the amount of memory on the guest VM:
-    vb.memory = "2048"
+    vb.cpus = 2
+    vb.memory = "4096"
     vb.name = "k3d box"
   end
 
@@ -44,7 +45,18 @@ Vagrant.configure("2") do |config|
     mv kubectl /usr/local/bin/
     chmod +x /usr/local/bin/kubectl
 
+    # install helm 3
+    curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+    helm repo add stable https://charts.helm.sh/stable
+
+    # Bash Completion for kubectl - very handy
+    echo ‘source <(kubectl completion bash)’ >>~/.bashrc
+
+    # Aliases
+    alias k='kubectl'
+
     # Add vagrant user to docker group (Running docker command without sudo)
     addgroup -a vagrant docker
+    echo "DHCP has provided the following IP: $(hostname -I | awk '{ print $2 }')"
   SHELL
 end

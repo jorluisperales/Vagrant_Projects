@@ -7,13 +7,16 @@ Vagrant.configure("2") do |config|
 
   config.vm.box_check_update = true
 
-  # Forwarded port mapping: 8052 -> 8502 for exposed service
-  config.vm.network "forwarded_port", guest: 8502, host: 8502
-  # Forwarded port mapping: 8052 -> 8502 for kubernetes dasboard
-  config.vm.network "forwarded_port", guest: 8503, host: 8503
+  # Forwarded ports
+  config.vm.network "forwarded_port", guest: 22, host: 2222, id: "ssh"
+  config.vm.network "forwarded_port", guest: 22, host: 2000 # Master Node SSH
+  config.vm.network "forwarded_port", guest: 6443, host: 6443 # API Access
+  for p in 30000..32767 # expose NodePort IP's
+    config.vm.network "forwarded_port", guest: p, host: p, protocol: "tcp"
+  end
 
   # Create a private network, which allows host-only access to the machine
-  # using a specific IP.
+  # IP will be assigned by DHCP.
   config.vm.network "private_network", type: "dhcp"
 
   # Customize hostname of the guestVM
@@ -37,9 +40,11 @@ Vagrant.configure("2") do |config|
     add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
     apt-get update -y
     apt-get install -y docker-ce docker-ce-cli containerd.io
+
     # Install k3d
     # Reference: https://github.com/rancher/k3d
     wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
+
     # Install kubectl
     curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
     mv kubectl /usr/local/bin/
@@ -50,10 +55,12 @@ Vagrant.configure("2") do |config|
     helm repo add stable https://charts.helm.sh/stable
 
     # Bash Completion for kubectl - very handy
-    echo ‘source <(kubectl completion bash)’ >>~/.bashrc
+    #apt-get install -y bash-completion
+    #echo "source <(kubectl completion bash)" >> ~/.bashrc
+    #source ~/.bashrc
 
     # Aliases
-    alias k='kubectl'
+    #alias k='kubectl'
 
     # Add vagrant user to docker group (Running docker command without sudo)
     addgroup -a vagrant docker

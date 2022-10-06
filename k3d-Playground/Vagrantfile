@@ -9,7 +9,6 @@ Vagrant.configure("2") do |config|
 
   # Forwarded ports
   config.vm.network "forwarded_port", guest: 22, host: 2222, id: "ssh"
-  config.vm.network "forwarded_port", guest: 22, host: 2000 # Master Node SSH
   config.vm.network "forwarded_port", guest: 6443, host: 6443 # API Access
   for p in 30000..32767 # expose NodePort IP's
     config.vm.network "forwarded_port", guest: p, host: p, protocol: "tcp"

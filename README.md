@@ -1,3 +1,3 @@
 # Vagrant_Projects
 
-These are all Vagrant files, make sure to copy and paste on an empty Vagrantfile
+A set of Vagrant projects with multiple cool and useful configuration, check them out!
